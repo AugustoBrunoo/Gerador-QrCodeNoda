@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Link2 } from "lucide-react";
+import QRCodeStyling from "qr-code-styling";
 
 import { Header } from "./components/Header";
 import { Toast } from "./components/ui/Toast";
@@ -52,13 +53,21 @@ export default function App() {
   };
 
   const handleDownload = (format) => {
-    if (!qrCodeRef.current) return;
-    qrCodeRef.current.update({ width: downloadSize, height: downloadSize });
-    setTimeout(() => {
-      qrCodeRef.current.download({ name: "qrcode-noda-solucoes", extension: format });
-      qrCodeRef.current.update({ width: qrSize, height: qrSize });
-      showNotification(`QR Code baixado em formato ${format.toUpperCase()}!`);
-    }, 150);
+    const downloadQr = new QRCodeStyling({
+      width: downloadSize,
+      height: downloadSize,
+      type: "canvas",
+      data: url || "https://nodasolucoes.dev",
+      image: includeLogo ? customLogo : "",
+      dotsOptions: { color: dotColor, type: dotType },
+      backgroundOptions: { color: bgColor },
+      imageOptions: { crossOrigin: "anonymous", margin: 4, imageSize: logoSize },
+      cornersSquareOptions: { color: cornerColor, type: cornerType },
+      cornersDotOptions: { color: dotColor, type: cornerDotType }
+    });
+    
+    downloadQr.download({ name: "qrcode-noda-solucoes", extension: format });
+    showNotification(`QR Code baixado em formato ${format.toUpperCase()}!`);
   };
 
   const handleCopyToClipboard = async () => {
